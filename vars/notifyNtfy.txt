@@ -1,0 +1,29 @@
+<h2><code>notifyNtfy</code></h2>
+
+<p>Publish a single notification to ntfy. Lowest-level helper in this library — for the typical Jenkins post-block use case, prefer <code>notifyJenkinsBuild</code> or <code>notifyOnFailure</code>.</p>
+
+<h3>Usage</h3>
+
+<pre><code>notifyNtfy(
+    topic: 'jenkins',
+    title: 'Deploy finished',
+    message: "Production rollout complete\n${env.BUILD_URL}",
+    tags: ['white_check_mark', 'rocket'],
+    priority: 'default',
+)
+</code></pre>
+
+<h3>Parameters</h3>
+
+<table>
+<tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td><code>topic</code></td><td>String</td><td><code>'jenkins'</code></td><td>ntfy topic to publish to</td></tr>
+<tr><td><code>title</code></td><td>String</td><td><code>env.JOB_NAME</code></td><td>Notification header</td></tr>
+<tr><td><code>message</code></td><td>String</td><td>—</td><td>Body text (required)</td></tr>
+<tr><td><code>tags</code></td><td>List&lt;String&gt;</td><td><code>[]</code></td><td>ntfy emoji shortcodes</td></tr>
+<tr><td><code>priority</code></td><td>String</td><td><code>'default'</code></td><td><code>min</code> | <code>low</code> | <code>default</code> | <code>high</code> | <code>max</code></td></tr>
+<tr><td><code>server</code></td><td>String</td><td><code>https://ntfy.example.com</code></td><td>Base URL of the ntfy instance</td></tr>
+<tr><td><code>credentialsId</code></td><td>String</td><td><code>'ntfy-admin-token'</code></td><td>Jenkins Secret Text credential ID for the bearer token</td></tr>
+</table>
+
+<p><strong>Failure semantics:</strong> a failed publish does not fail the build; the step logs a warning and continues.</p>

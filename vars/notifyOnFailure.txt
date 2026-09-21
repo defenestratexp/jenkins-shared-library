@@ -1,0 +1,12 @@
+<h2><code>notifyOnFailure</code></h2>
+
+<p>Send a Jenkins build status notification only when the build did not succeed. Wraps <code>notifyJenkinsBuild</code> with a SUCCESS short-circuit.</p>
+
+<h3>Usage</h3>
+
+<pre><code>post {
+    always { notifyOnFailure() }
+}
+</code></pre>
+
+<p>Accepts the same parameters as <code>notifyJenkinsBuild</code>. Use this when you only want pings for breakage and explicitly do not want red→green recovery notifications.</p>

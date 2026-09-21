@@ -1,0 +1,41 @@
+<h2><code>notifyJenkinsBuild</code></h2>
+
+<p>Send a Jenkins build status notification to ntfy. Designed for use in a pipeline's <code>post { always {} }</code> block.</p>
+
+<h3>Usage</h3>
+
+<pre><code>@Library('jenkins-shared-library') _
+
+pipeline {
+    agent { label 'ops' }
+    stages {
+        // ...
+    }
+    post {
+        always { notifyJenkinsBuild() }
+    }
+}
+</code></pre>
+
+<h3>Default policy</h3>
+
+<p>Notify on any non-SUCCESS result. Notify on SUCCESS only when the previous build was not SUCCESS (red→green recovery). This avoids the constant-green spam that would train you to ignore the topic.</p>
+
+<h3>Parameters</h3>
+
+<table>
+<tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td><code>topic</code></td><td>String</td><td><code>'jenkins'</code></td><td>ntfy topic to publish to</td></tr>
+<tr><td><code>onlyOnStatusChange</code></td><td>Boolean</td><td><code>true</code></td><td>Suppress green-on-green notifications; set to <code>false</code> for jobs where you always want a confirmation</td></tr>
+<tr><td><code>credentialsId</code></td><td>String</td><td><code>'ntfy-admin-token'</code></td><td>Jenkins Secret Text credential ID for the bearer token</td></tr>
+<tr><td><code>server</code></td><td>String</td><td><code>https://ntfy.example.com</code></td><td>Base URL of the ntfy instance</td></tr>
+</table>
+
+<h3>Notification format</h3>
+
+<ul>
+<li><strong>Title</strong>: <code>&lt;JOB_NAME&gt; #&lt;BUILD_NUMBER&gt; — &lt;STATUS&gt;</code> (or <code>recovered (&lt;prev&gt; → SUCCESS)</code> on red→green)</li>
+<li><strong>Body</strong>: status, duration, build URL</li>
+<li><strong>Priority</strong>: <code>high</code> on FAILURE, <code>default</code> otherwise</li>
+<li><strong>Tags</strong>: <code>white_check_mark</code> / <code>warning</code> / <code>x</code> / <code>no_entry_sign</code></li>
+</ul>
