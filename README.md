@@ -6,16 +6,7 @@ It comes from a working homelab Jenkins setup, where every pipeline loads it. Ho
 
 ## How it works
 
-```
-Jenkinsfile post { always { notifyJenkinsBuild() } }
-        │
-        ▼
-vars/notifyJenkinsBuild ── Ntfy.shouldNotify(current, previous)  ── skip continuous green
-        │                  Ntfy.presentation(status)               ── emoji tag + priority
-        ▼
-vars/notifyNtfy ── withCredentials(Secret text) ── curl POST ──▶ https://ntfy.example.com/<topic>
-                                                   (a failed publish never fails the build)
-```
+![Notification flow](docs/diagrams/notification-flow.png)
 
 - `src/com/example/jenkins/Ntfy.groovy` is plain Groovy with no side effects: it maps status to tag and priority, and holds the "notify on status change" rule.
 - `vars/` holds the pipeline steps. All side effects (credentials, `sh`, `curl`) live here.
@@ -26,7 +17,7 @@ vars/notifyNtfy ── withCredentials(Secret text) ── curl POST ──▶ h
 | Step | Purpose |
 |------|---------|
 | `notifyNtfy(topic:, title:, message:, tags:, priority:, server:, credentialsId:)` | Lowest-level publish helper. Use it when you need full control over the content. |
-| `notifyJenkinsBuild(topic:, onlyOnStatusChange:, context:)` | Drop-in for `post { always {} }`. Formats the job name, status, duration and build URL. By default it skips green-after-green builds to avoid notification fatigue. `context` puts what the build actually did (for example, which playbook a multiplexer job ran) at the front of the title. |
+| `notifyJenkinsBuild(topic:, onlyOnStatusChange:, context:, server:, credentialsId:)` | Drop-in for `post { always {} }`. Formats the job name, status, duration and build URL. By default it skips green-after-green builds to avoid notification fatigue. `context` puts what the build actually did (for example, which playbook a multiplexer job ran) at the front of the title. |
 | `notifyOnFailure(topic:)` | Strict variant that only notifies when the build is not SUCCESS, with no recovery pings. |
 
 Each step also has a `vars/<step>.txt` help page, which Jenkins shows in the Pipeline Syntax reference.

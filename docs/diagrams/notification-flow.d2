@@ -1,0 +1,19 @@
+direction: down
+
+jenkins: Jenkins {
+  post: "Jenkinsfile\npost { always { notifyJenkinsBuild() } }"
+  njb: "vars/notifyJenkinsBuild"
+  policy: "Ntfy.shouldNotify(current, previous)\nskip green after green"
+  look: "Ntfy.presentation(status)\ntag + priority"
+  nn: "vars/notifyNtfy\nwithCredentials(Secret text)"
+  post -> njb
+  njb -> policy
+  njb -> look
+  njb -> nn: "title, message, tag, priority"
+}
+
+ntfy: "ntfy server\nhttps://ntfy.example.com/<topic>" {shape: cloud}
+phone: Phone {shape: person}
+
+jenkins.nn -> ntfy: "curl POST + bearer token\n(a failed publish never fails the build)"
+ntfy -> phone: push notification
